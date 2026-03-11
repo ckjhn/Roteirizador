@@ -1541,15 +1541,50 @@
             if (diasGeracao > 0) score += (diasGeracao * 2); 
             if (diasVencido > 0) score += (diasVencido * 15); else score += (diasVencido * 5); 
 
-            let osData = { os: numOS, cidade, bairro, geracao: dGeracao.toLocaleDateString(), vencimento: dVenc.toLocaleDateString(), rawScore: score, diasVencido, isPegarCedo, isRetro, isRedeNaoLocalizada, isApoio, canceladasPor };
+            // --- Ler Latitude e Longitude do Excel ---
+            let excelLat = parseFloat(os['Latitude']);
+            let excelLng = parseFloat(os['Longitude']);
+            let hasExcelCoords = !isNaN(excelLat) && !isNaN(excelLng) && excelLat !== 0 && excelLng !== 0;
+
+            let osData = { os: numOS, cidade, bairro, geracao: dGeracao.toLocaleDateString(), vencimento: dVenc.toLocaleDateString(), rawScore: score, diasVencido, isPegarCedo, isRetro, isRedeNaoLocalizada, isApoio, canceladasPor, usouCoordenadaExcel: false };
 
             if (obs2.length > 0) { restritasObs2.push(osData); return; }
 
-            if (dbBairros[cidade] && dbBairros[cidade][bairro]) {
+            let bairroMapeado = dbBairros[cidade] && dbBairros[cidade][bairro];
+            const LIMITE_DISTANCIA_VALIDACAO_KM = 5; // Distância máxima aceitável entre coordenada Excel e bairro
+
+            if (hasExcelCoords && bairroMapeado) {
+                // Coordenada do Excel + bairro mapeado → validar distância
+                let distBairro = haversine(excelLat, excelLng, dbBairros[cidade][bairro].lat, dbBairros[cidade][bairro].lng);
+                if (distBairro <= LIMITE_DISTANCIA_VALIDACAO_KM) {
+                    // Coordenada está próxima do bairro → usar coordenada precisa do Excel
+                    osData.lat = excelLat;
+                    osData.lng = excelLng;
+                    osData.usouCoordenadaExcel = true;
+                } else {
+                    // Coordenada muito distante do bairro → desconsiderar, usar bairro
+                    osData.lat = dbBairros[cidade][bairro].lat;
+                    osData.lng = dbBairros[cidade][bairro].lng;
+                    osData._coordExcelDescartada = true;
+                    osData._distanciaBairroKm = distBairro.toFixed(1);
+                }
+                validOS.push(osData);
+            } else if (hasExcelCoords && !bairroMapeado) {
+                // Coordenada do Excel mas bairro NÃO mapeado → usar coordenada (não há como validar, mas temos posição)
+                osData.lat = excelLat;
+                osData.lng = excelLng;
+                osData.usouCoordenadaExcel = true;
+                osData._semBairroMapeado = true;
+                validOS.push(osData);
+            } else if (!hasExcelCoords && bairroMapeado) {
+                // Sem coordenada no Excel, bairro mapeado → usar bairro (comportamento original)
                 osData.lat = dbBairros[cidade][bairro].lat;
                 osData.lng = dbBairros[cidade][bairro].lng;
                 validOS.push(osData);
-            } else { pendencias.push(osData); }
+            } else {
+                // Sem coordenada e sem bairro mapeado → pendência
+                pendencias.push(osData);
+            }
         });
 
         const maxDist = parseFloat(document.getElementById('configMaxDist').value) || 20;
@@ -1746,8 +1781,10 @@
         for (let re of rotasEquipes) {
             if(re.rota.length === 0) continue;
             re.rota.forEach((os, idx) => {
-                let m = L.circleMarker([os.lat, os.lng], {color: re.equipe.cor, radius: 7, fillOpacity: 0.9, weight: 2}).addTo(map);
-                m.bindTooltip(`${idx+1}º - OS ${os.os}`, {permanent: false, direction: 'top'});
+                let markerRadius = os.usouCoordenadaExcel ? 8 : 7;
+                let m = L.circleMarker([os.lat, os.lng], {color: re.equipe.cor, radius: markerRadius, fillOpacity: 0.9, weight: 2}).addTo(map);
+                let coordLabel = os.usouCoordenadaExcel ? ' 📍GPS' : (os._coordExcelDescartada ? ' ⚠️Bairro (GPS descartado)' : '');
+                m.bindTooltip(`${idx+1}º - OS ${os.os}${coordLabel}`, {permanent: false, direction: 'top'});
                 polylineLayers.push(m); allBounds.push([os.lat, os.lng]);
             });
 
@@ -1771,6 +1808,9 @@
     function gerarBadges(os) {
         let badges = '';
         if (os._forcada) badges += '<span class="badge" style="background:linear-gradient(135deg,#f59e0b,#f97316);">📌 Prioridade</span>';
+        if (os.usouCoordenadaExcel) badges += '<span class="badge" style="background:linear-gradient(135deg,#059669,#10b981);">📍 GPS</span>';
+        if (os._coordExcelDescartada) badges += '<span class="badge" style="background:linear-gradient(135deg,#9ca3af,#6b7280);" title="Coordenada descartada: ' + os._distanciaBairroKm + 'km do bairro">⚠️ GPS Descartado</span>';
+        if (os._semBairroMapeado) badges += '<span class="badge" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">📍 GPS (Bairro ñ mapeado)</span>';
         if (os.isPegarCedo) badges += '<span class="badge badge-cedo">☀️ Cedo</span>';
         if (os.isRetro) badges += '<span class="badge badge-retro">🚜 Retro</span>';
         if (os.isRedeNaoLocalizada) badges += '<span class="badge badge-rede">❌ Ñ Localizada</span>';
@@ -1905,6 +1945,11 @@
         let noPrazo = todasOS.filter(o => o.diasVencido < -2);
         let filaEspera = sobrou.length;
 
+        // GPS Stats
+        let osComGPS = todasOS.filter(o => o.usouCoordenadaExcel);
+        let osGPSDescartado = todasOS.filter(o => o._coordExcelDescartada);
+        let osGPSSemBairro = todasOS.filter(o => o._semBairroMapeado);
+
         // Summary
         let summaryHtml = `<div class="ai-summary">
             <div class="ai-stat ai-stat-danger"><div class="ai-stat-num">${vencidas.length}</div><div class="ai-stat-label">Vencidas</div></div>
@@ -1913,6 +1958,7 @@
             <div class="ai-stat ai-stat-success"><div class="ai-stat-num">${noPrazo.length}</div><div class="ai-stat-label">No Prazo</div></div>
             <div class="ai-stat ai-stat-info"><div class="ai-stat-num">${filaEspera}</div><div class="ai-stat-label">Na Fila</div></div>
             <div class="ai-stat"><div class="ai-stat-num">${pendencias.length}</div><div class="ai-stat-label">Sem Mapa</div></div>
+            ${(osComGPS.length + osGPSDescartado.length > 0) ? `<div class="ai-stat" style=""><div class="ai-stat-num" style="color:#059669;">${osComGPS.length}</div><div class="ai-stat-label">📍 Com GPS</div></div>` : ''}
         </div>`;
         body.innerHTML += summaryHtml;
 
@@ -2012,6 +2058,29 @@
                 icon: '📍',
                 titulo: `${pendencias.length} OS sem mapeamento de bairro`,
                 desc: `Bairros faltando: <strong>${cidades.slice(0,5).join(', ')}</strong>${cidades.length > 5 ? ` e mais ${cidades.length - 5}` : ''}. Clique no mapa para mapear.`
+            });
+        }
+
+        // ---- ANÁLISE 5b: GPS Descartado (coordenadas muito distantes do bairro) ----
+        if (osGPSDescartado.length > 0) {
+            let listDesc = osGPSDescartado.slice(0, 5).map(os =>
+                `<strong>OS ${os.os}</strong> (${os.bairro}) — coordenada a ${os._distanciaBairroKm}km do bairro`
+            ).join('<br>');
+            alertas.push({
+                tipo: 'warning',
+                icon: '🛰️',
+                titulo: `${osGPSDescartado.length} coordenada${osGPSDescartado.length > 1 ? 's' : ''} GPS descartada${osGPSDescartado.length > 1 ? 's' : ''} (muito distante${osGPSDescartado.length > 1 ? 's' : ''} do bairro)`,
+                desc: listDesc + '<br><span class="ai-suggestion">💡 Verifique se a Lat/Lng dessas OS estão corretas no Excel</span>'
+            });
+        }
+
+        // ---- ANÁLISE 5c: GPS usado em OS sem bairro mapeado ----
+        if (osGPSSemBairro.length > 0) {
+            alertas.push({
+                tipo: 'info',
+                icon: '🛰️',
+                titulo: `${osGPSSemBairro.length} OS salva${osGPSSemBairro.length > 1 ? 's' : ''} por coordenadas GPS (bairro não mapeado)`,
+                desc: `Estas OS não tinham bairro no mapa, mas foram roteirizadas graças às coordenadas Lat/Lng do Excel. <span class="ai-suggestion">💡 Considere mapear esses bairros para futuras validações</span>`
             });
         }
 
