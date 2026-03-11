@@ -232,6 +232,19 @@
             box-shadow: var(--panel-shadow); margin-bottom: 24px;
         }
         #map { height: 500px; width: 100%; z-index: 1; }
+        .bairro-label {
+            background: var(--panel) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--panel-border) !important;
+            border-radius: 4px !important;
+            padding: 2px 7px !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+            white-space: nowrap !important;
+        }
+        .bairro-label::before { display: none !important; }
 
         /* === TABLE === */
         .table-section {
@@ -1214,7 +1227,7 @@
 
     for (const cid in dbBairros) {
         for (const bai in dbBairros[cid]) {
-            let m = L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`);
+            let m = L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`).bindTooltip(bai, {permanent: true, direction: 'right', offset: [12, 0], className: 'bairro-label'});
             marcadoresBairros.push(m);
         }
     }
@@ -1238,7 +1251,7 @@
         if (!dbBairros[c]) dbBairros[c] = {};
         dbBairros[c][b] = { lat: tempLat, lng: tempLng };
         salvarEstadoGeral();
-        L.marker([tempLat, tempLng]).addTo(map).bindPopup(`<strong>${b}</strong><br>${c}`);
+        L.marker([tempLat, tempLng]).addTo(map).bindPopup(`<strong>${b}</strong><br>${c}`).bindTooltip(b, {permanent: true, direction: 'right', offset: [12, 0], className: 'bairro-label'});
         fecharModais();
     }
 
@@ -2546,7 +2559,7 @@
         marcadoresBairros = [];
         for (const cid in dbBairros) {
             for (const bai in dbBairros[cid]) {
-                let m = L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`);
+                let m = L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`).bindTooltip(bai, {permanent: true, direction: 'right', offset: [12, 0], className: 'bairro-label'});
                 marcadoresBairros.push(m);
             }
         }
@@ -2561,7 +2574,7 @@
         if (!dbBairros[c]) dbBairros[c] = {};
         dbBairros[c][b] = { lat: tempLat, lng: tempLng };
         salvarEstadoGeral();
-        let m = L.marker([tempLat, tempLng]).addTo(map).bindPopup(`<strong>${b}</strong><br>${c}`);
+        let m = L.marker([tempLat, tempLng]).addTo(map).bindPopup(`<strong>${b}</strong><br>${c}`).bindTooltip(b, {permanent: true, direction: 'right', offset: [12, 0], className: 'bairro-label'});
         marcadoresBairros.push(m);
         fecharModais();
     };
