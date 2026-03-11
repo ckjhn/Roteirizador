@@ -667,6 +667,177 @@
             transition: 0.2s; width: auto;
         }
         .btn-header:hover { background: var(--accent-soft); transform: none; }
+        .btn-header-ai {
+            height: 38px; padding: 0 16px; border-radius: 10px;
+            border: none; background: linear-gradient(135deg, #a855f7, #4f5aff);
+            color: white; font-size: 12px; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; gap: 6px;
+            transition: 0.2s; width: auto; letter-spacing: 0.2px;
+            box-shadow: 0 2px 12px rgba(168,85,247,0.3);
+        }
+        .btn-header-ai:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(168,85,247,0.4); }
+
+        /* === LOCATION MANAGER MODAL === */
+        #modalLocais {
+            width: 620px; max-height: 85vh; overflow-y: auto;
+            border-top: 3px solid #f97316;
+        }
+        #modalLocais h3 { color: #f97316; }
+        .loc-search {
+            display: flex; gap: 8px; margin-bottom: 14px; align-items: center;
+        }
+        .loc-search input { flex: 1; margin-bottom: 0; }
+        .loc-search .loc-count {
+            font-size: 12px; color: var(--text-sub); white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .loc-city-group {
+            margin-bottom: 12px; border: 1px solid var(--panel-border);
+            border-radius: var(--radius-sm); overflow: hidden;
+        }
+        .loc-city-header {
+            padding: 10px 14px; background: var(--input-bg);
+            font-weight: 700; font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--panel-border);
+            transition: background 0.15s; user-select: none;
+        }
+        .loc-city-header:hover { background: var(--accent-soft); }
+        .loc-city-header .loc-city-info { display: flex; align-items: center; gap: 8px; }
+        .loc-city-header .loc-city-count {
+            font-size: 11px; color: var(--text-sub); font-weight: 500;
+            background: var(--panel); padding: 2px 8px; border-radius: 20px;
+        }
+        .loc-city-header .loc-toggle { font-size: 14px; color: var(--text-sub); transition: transform 0.2s; }
+        .loc-city-header.collapsed .loc-toggle { transform: rotate(-90deg); }
+        .loc-city-body { max-height: 400px; overflow-y: auto; }
+        .loc-city-body.collapsed { display: none; }
+        .loc-bairro-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 14px; border-bottom: 1px solid var(--panel-border);
+            font-size: 12px; transition: background 0.1s;
+        }
+        .loc-bairro-item:last-child { border-bottom: none; }
+        .loc-bairro-item:hover { background: rgba(239,68,68,0.04); }
+        .loc-bairro-info { display: flex; align-items: center; gap: 10px; }
+        .loc-bairro-name { font-weight: 600; }
+        .loc-bairro-coords {
+            font-size: 10px; color: var(--text-sub);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .loc-bairro-del {
+            width: 28px; height: 28px; border-radius: 6px;
+            border: 1.5px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.06);
+            color: var(--danger); font-size: 13px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; padding: 0;
+        }
+        .loc-bairro-del:hover {
+            background: var(--danger); color: white;
+            border-color: var(--danger); transform: scale(1.1);
+        }
+        .loc-city-del-all {
+            padding: 4px 10px; border-radius: 6px; font-size: 10px;
+            background: rgba(239,68,68,0.08); color: var(--danger);
+            border: 1px solid rgba(239,68,68,0.2); cursor: pointer;
+            font-weight: 700; transition: all 0.15s; width: auto;
+        }
+        .loc-city-del-all:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        .loc-list-container { max-height: 55vh; overflow-y: auto; margin-bottom: 14px; }
+        .loc-list-container::-webkit-scrollbar { width: 4px; }
+        .loc-list-container::-webkit-scrollbar-thumb { background: var(--input-border); border-radius: 10px; }
+        .loc-empty { text-align: center; padding: 30px; color: var(--text-sub); font-size: 13px; }
+
+        /* === AI ADVISOR MODAL === */
+        #modalAiAdvisor {
+            width: 90vw; max-width: 780px; max-height: 88vh; overflow-y: auto;
+            border-top: 3px solid transparent;
+            border-image: linear-gradient(135deg, #a855f7, #4f5aff, #06b6d4) 1;
+        }
+        #modalAiAdvisor h3 {
+            background: linear-gradient(135deg, #a855f7, #4f5aff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; font-size: 18px;
+        }
+        .adv-subtitle {
+            font-size: 12px; color: var(--text-sub); margin-bottom: 20px;
+            line-height: 1.6; padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.06), rgba(79,90,255,0.06));
+            border-radius: var(--radius-sm); border-left: 3px solid #a855f7;
+        }
+        .adv-loading {
+            text-align: center; padding: 40px 20px; color: var(--text-sub);
+        }
+        .adv-loading-spinner {
+            width: 40px; height: 40px; border: 3px solid var(--input-border);
+            border-top-color: #a855f7; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 14px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .adv-section {
+            margin-bottom: 16px; border: 1px solid var(--panel-border);
+            border-radius: var(--radius-sm); overflow: hidden;
+        }
+        .adv-section-header {
+            padding: 12px 16px; background: var(--input-bg);
+            font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; gap: 8px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+        .adv-section-header .adv-priority {
+            font-size: 9px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.6px; padding: 3px 8px; border-radius: 20px; color: white;
+        }
+        .adv-priority-critical { background: var(--danger); }
+        .adv-priority-high { background: #f97316; }
+        .adv-priority-medium { background: var(--warning); }
+        .adv-priority-low { background: var(--info); }
+        .adv-priority-tip { background: var(--accent2); }
+        .adv-section-body { padding: 14px 16px; }
+        .adv-trip-card {
+            background: var(--input-bg); border-radius: var(--radius-xs);
+            padding: 12px 14px; margin-bottom: 8px; border-left: 4px solid var(--accent);
+            transition: background 0.15s;
+        }
+        .adv-trip-card:hover { background: var(--accent-soft); }
+        .adv-trip-card:last-child { margin-bottom: 0; }
+        .adv-trip-header {
+            font-weight: 700; font-size: 13px; margin-bottom: 4px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .adv-trip-detail { font-size: 11px; color: var(--text-sub); line-height: 1.7; }
+        .adv-trip-detail strong { color: var(--text); }
+        .adv-metric-row {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;
+        }
+        .adv-metric {
+            flex: 1; min-width: 100px; text-align: center;
+            padding: 10px 8px; background: var(--input-bg);
+            border-radius: var(--radius-xs); border: 1px solid var(--panel-border);
+        }
+        .adv-metric-num {
+            font-size: 20px; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .adv-metric-label {
+            font-size: 10px; color: var(--text-sub);
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+        .adv-tip {
+            padding: 10px 14px; background: rgba(0,184,147,0.06);
+            border-left: 3px solid var(--accent2); border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+            font-size: 12px; color: var(--text-sub); line-height: 1.7; margin-bottom: 8px;
+        }
+        .adv-tip:last-child { margin-bottom: 0; }
+        .adv-tip strong { color: var(--text); }
+        .adv-coverage-bar {
+            height: 8px; background: var(--input-bg); border-radius: 4px;
+            overflow: hidden; margin: 6px 0;
+        }
+        .adv-coverage-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.6s ease;
+        }
     </style>
 </head>
 <body>
@@ -677,6 +848,8 @@
         Roteirizador PRO MAX
     </h1>
     <div class="header-actions">
+        <button class="btn-header-ai" onclick="abrirAiAdvisor()" title="AI Advisor — Sugestões Inteligentes">🤖 AI Advisor</button>
+        <button class="btn-header" onclick="abrirLocais()" title="Gerenciar Locais Salvos">📍 Locais</button>
         <button class="btn-header" onclick="abrirDataMgmt()" title="Data Management">💾 Data</button>
         <button id="themeToggle" onclick="toggleTheme()" title="Alternar Tema">🌙</button>
     </div>
@@ -899,6 +1072,37 @@
     </div>
 </div>
 
+<!-- LOCATION MANAGER MODAL -->
+<div id="modalLocais" class="modal-base">
+    <h3>📍 Gerenciar Locais Salvos</h3>
+    <div class="loc-search">
+        <input type="text" id="locSearchInput" placeholder="🔍 Buscar cidade ou bairro..." oninput="filtrarLocais()">
+        <span class="loc-count" id="locCount">0 locais</span>
+    </div>
+    <div class="loc-list-container" id="locListContainer"></div>
+    <div style="display: flex; gap: 8px;">
+        <button onclick="fecharModais()" class="btn-cancel" style="flex:1;">Fechar</button>
+    </div>
+</div>
+
+<!-- AI ADVISOR MODAL -->
+<div id="modalAiAdvisor" class="modal-base">
+    <h3>🤖 AI Advisor — Inteligência Estratégica</h3>
+    <div class="adv-subtitle">
+        Análise completa dos seus dados de roteirização. O AI Advisor cruza informações de <strong>locais mapeados</strong>, <strong>equipes cadastradas</strong> e <strong>histórico de rotas</strong> para gerar recomendações estratégicas sobre quais viagens parecem ser mais necessárias e como otimizar sua operação.
+    </div>
+    <div id="aiAdvisorContent">
+        <div class="adv-loading">
+            <div class="adv-loading-spinner"></div>
+            Analisando dados...
+        </div>
+    </div>
+    <div style="margin-top: 14px; display: flex; gap: 8px;">
+        <button onclick="gerarAnaliseAiAdvisor()" style="background: linear-gradient(135deg, #a855f7, #4f5aff);">🔄 Atualizar Análise</button>
+        <button onclick="fecharModais()" class="btn-cancel">Fechar</button>
+    </div>
+</div>
+
 <script>
     // --- ESTADOS E INICIALIZAÇÃO ---
     let appData = JSON.parse(localStorage.getItem('appRoteirizadorData')) || { dbBairros: {}, equipes: [] };
@@ -1004,12 +1208,14 @@
     // --- MAPA ---
     let tempLat = null, tempLng = null, polylineLayers = [];
     let reorderPreviewMap = null;
+    let marcadoresBairros = [];
     const map = L.map('map').setView([-22.85, -42.05], 10); 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
 
     for (const cid in dbBairros) {
         for (const bai in dbBairros[cid]) {
-            L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`);
+            let m = L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`);
+            marcadoresBairros.push(m);
         }
     }
 
@@ -2212,6 +2418,429 @@
         } catch(e) {
             dmLog(`❌ Erro: ${e.message}`, 'error');
         }
+    }
+
+    // =====================================================
+    // === LOCATION MANAGER - Gerenciar Locais Salvos
+    // =====================================================
+    function abrirLocais() {
+        renderizarLocais();
+        document.getElementById('locSearchInput').value = '';
+        document.getElementById('modalLocais').style.display = 'block';
+        document.getElementById('modalOverlay').style.display = 'block';
+    }
+
+    function renderizarLocais() {
+        let container = document.getElementById('locListContainer');
+        container.innerHTML = '';
+        let cidades = Object.keys(dbBairros).sort();
+        let totalBairros = 0;
+
+        if (cidades.length === 0) {
+            container.innerHTML = '<div class="loc-empty">📍 Nenhum local salvo ainda.<br>Clique no mapa para mapear bairros.</div>';
+            document.getElementById('locCount').textContent = '0 locais';
+            return;
+        }
+
+        cidades.forEach(cidade => {
+            let bairros = Object.keys(dbBairros[cidade]).sort();
+            totalBairros += bairros.length;
+
+            let group = document.createElement('div');
+            group.className = 'loc-city-group';
+            group.dataset.cidade = cidade.toLowerCase();
+
+            let header = document.createElement('div');
+            header.className = 'loc-city-header';
+            header.innerHTML = `
+                <div class="loc-city-info">
+                    <span>🏙️ ${cidade}</span>
+                    <span class="loc-city-count">${bairros.length} bairro${bairros.length > 1 ? 's' : ''}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button class="loc-city-del-all" onclick="event.stopPropagation();apagarCidade('${cidade}')">🗑️ Apagar Cidade</button>
+                    <span class="loc-toggle">▾</span>
+                </div>
+            `;
+            header.onclick = function(e) {
+                if (e.target.closest('.loc-city-del-all')) return;
+                this.classList.toggle('collapsed');
+                this.nextElementSibling.classList.toggle('collapsed');
+            };
+
+            let body = document.createElement('div');
+            body.className = 'loc-city-body';
+
+            bairros.forEach(bairro => {
+                let coords = dbBairros[cidade][bairro];
+                let item = document.createElement('div');
+                item.className = 'loc-bairro-item';
+                item.dataset.bairro = bairro.toLowerCase();
+                item.innerHTML = `
+                    <div class="loc-bairro-info">
+                        <span class="loc-bairro-name">${bairro}</span>
+                        <span class="loc-bairro-coords">${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}</span>
+                    </div>
+                    <button class="loc-bairro-del" onclick="apagarBairro('${cidade}','${bairro}')" title="Apagar ${bairro}">✕</button>
+                `;
+                body.appendChild(item);
+            });
+
+            group.appendChild(header);
+            group.appendChild(body);
+            container.appendChild(group);
+        });
+
+        document.getElementById('locCount').textContent = `${totalBairros} locais em ${cidades.length} cidade${cidades.length > 1 ? 's' : ''}`;
+    }
+
+    function filtrarLocais() {
+        let query = document.getElementById('locSearchInput').value.toLowerCase().trim();
+        let groups = document.querySelectorAll('#locListContainer .loc-city-group');
+        let count = 0;
+        groups.forEach(group => {
+            let cidadeMatch = group.dataset.cidade.includes(query);
+            let items = group.querySelectorAll('.loc-bairro-item');
+            let anyBairroMatch = false;
+            items.forEach(item => {
+                let match = !query || cidadeMatch || item.dataset.bairro.includes(query);
+                item.style.display = match ? 'flex' : 'none';
+                if (match) { anyBairroMatch = true; count++; }
+            });
+            group.style.display = (cidadeMatch || anyBairroMatch) ? 'block' : 'none';
+            if (cidadeMatch) {
+                items.forEach(item => { item.style.display = 'flex'; });
+                count = 0;
+                items.forEach(item => { if (item.style.display !== 'none') count++; });
+            }
+        });
+        // Recount all visible
+        let total = document.querySelectorAll('#locListContainer .loc-bairro-item:not([style*="display: none"])').length;
+        document.getElementById('locCount').textContent = `${total} locais visíveis`;
+    }
+
+    function apagarBairro(cidade, bairro) {
+        if (!confirm(`Apagar o bairro "${bairro}" de "${cidade}"?\n\nEssa ação não pode ser desfeita.`)) return;
+        if (dbBairros[cidade] && dbBairros[cidade][bairro]) {
+            delete dbBairros[cidade][bairro];
+            if (Object.keys(dbBairros[cidade]).length === 0) delete dbBairros[cidade];
+            salvarEstadoGeral();
+            renderizarLocais();
+            recarregarMarcadoresMapa();
+        }
+    }
+
+    function apagarCidade(cidade) {
+        let count = dbBairros[cidade] ? Object.keys(dbBairros[cidade]).length : 0;
+        if (!confirm(`Apagar TODOS os ${count} bairros de "${cidade}"?\n\nEssa ação não pode ser desfeita.`)) return;
+        delete dbBairros[cidade];
+        salvarEstadoGeral();
+        renderizarLocais();
+        recarregarMarcadoresMapa();
+    }
+
+    let marcadoresBairrosInit = true; // markers already tracked during init
+
+    function recarregarMarcadoresMapa() {
+        marcadoresBairros.forEach(m => map.removeLayer(m));
+        marcadoresBairros = [];
+        for (const cid in dbBairros) {
+            for (const bai in dbBairros[cid]) {
+                let m = L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`<strong>${bai}</strong><br>${cid}`);
+                marcadoresBairros.push(m);
+            }
+        }
+    }
+    
+    // Override salvarBairro to also track markers
+    let _origSalvarBairro = salvarBairro;
+    salvarBairro = function() {
+        let c = document.getElementById('inputCidade').value.trim().toUpperCase();
+        let b = document.getElementById('inputBairro').value.trim().toUpperCase();
+        if(!c || !b) return;
+        if (!dbBairros[c]) dbBairros[c] = {};
+        dbBairros[c][b] = { lat: tempLat, lng: tempLng };
+        salvarEstadoGeral();
+        let m = L.marker([tempLat, tempLng]).addTo(map).bindPopup(`<strong>${b}</strong><br>${c}`);
+        marcadoresBairros.push(m);
+        fecharModais();
+    };
+
+    // =====================================================
+    // === AI ADVISOR - Inteligência Estratégica
+    // =====================================================
+    function abrirAiAdvisor() {
+        document.getElementById('modalAiAdvisor').style.display = 'block';
+        document.getElementById('modalOverlay').style.display = 'block';
+        gerarAnaliseAiAdvisor();
+    }
+
+    function gerarAnaliseAiAdvisor() {
+        let content = document.getElementById('aiAdvisorContent');
+        content.innerHTML = '<div class="adv-loading"><div class="adv-loading-spinner"></div>Analisando dados e gerando recomendações...</div>';
+
+        // Simulate brief processing time for UX
+        setTimeout(() => {
+            let html = '';
+            let cidades = Object.keys(dbBairros);
+            let totalBairros = Object.values(dbBairros).reduce((a, c) => a + Object.keys(c).length, 0);
+            let numEquipes = equipes.length;
+
+            // ======== METRICS ========
+            html += `<div class="adv-metric-row">
+                <div class="adv-metric">
+                    <div class="adv-metric-num" style="color:var(--accent);">${cidades.length}</div>
+                    <div class="adv-metric-label">Cidades</div>
+                </div>
+                <div class="adv-metric">
+                    <div class="adv-metric-num" style="color:#f97316;">${totalBairros}</div>
+                    <div class="adv-metric-label">Bairros Mapeados</div>
+                </div>
+                <div class="adv-metric">
+                    <div class="adv-metric-num" style="color:var(--accent2);">${numEquipes}</div>
+                    <div class="adv-metric-label">Equipes</div>
+                </div>
+                <div class="adv-metric">
+                    <div class="adv-metric-num" style="color:var(--danger);">${lastPendencias.length}</div>
+                    <div class="adv-metric-label">Sem Mapa</div>
+                </div>
+            </div>`;
+
+            // ======== SECTION 1: VIAGENS URGENTES ========
+            if (lastRotasEquipes.length > 0) {
+                let todasOS = [];
+                lastRotasEquipes.forEach(re => re.rota.forEach(os => {
+                    if (!os.isCloneApoio) todasOS.push({...os, equipe: re.equipe.nome, cor: re.equipe.cor});
+                }));
+                lastUnassigned.forEach(os => todasOS.push({...os, equipe: null, cor: null}));
+
+                let vencidasNaoAlocadas = [...lastUnassigned, ...lastPendencias].filter(o => o.diasVencido > 0).sort((a,b) => b.diasVencido - a.diasVencido);
+                
+                if (vencidasNaoAlocadas.length > 0) {
+                    html += `<div class="adv-section">
+                        <div class="adv-section-header">
+                            <span class="adv-priority adv-priority-critical">CRÍTICO</span>
+                            🚨 Viagens Urgentes Necessárias — ${vencidasNaoAlocadas.length} OS pendentes vencidas
+                        </div>
+                        <div class="adv-section-body">`;
+
+                    // Group by city
+                    let porCidade = {};
+                    vencidasNaoAlocadas.forEach(os => {
+                        if (!porCidade[os.cidade]) porCidade[os.cidade] = [];
+                        porCidade[os.cidade].push(os);
+                    });
+
+                    Object.entries(porCidade).sort((a,b) => b[1].length - a[1].length).forEach(([cidade, oss]) => {
+                        let maxDias = Math.max(...oss.map(o => o.diasVencido));
+                        let bairros = [...new Set(oss.map(o => o.bairro))];
+                        html += `<div class="adv-trip-card" style="border-left-color:var(--danger);">
+                            <div class="adv-trip-header">
+                                <span style="color:var(--danger);">🔴</span>
+                                ${cidade} — ${oss.length} OS vencida${oss.length > 1 ? 's' : ''}
+                            </div>
+                            <div class="adv-trip-detail">
+                                <strong>Dias máx. vencido:</strong> ${maxDias} dias<br>
+                                <strong>Bairros afetados:</strong> ${bairros.slice(0,5).join(', ')}${bairros.length > 5 ? ` (+${bairros.length-5})` : ''}<br>
+                                <strong>Recomendação:</strong> Agendar viagem <strong>imediata</strong> para esta cidade. ${oss.length >= 3 ? 'Volume alto — considere enviar 2 equipes.' : 'Uma equipe é suficiente.'}
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div></div>';
+                }
+
+                // ======== SECTION 2: CONCENTRAÇÃO GEOGRÁFICA ========
+                let distribuicao = {};
+                todasOS.forEach(os => {
+                    if (!distribuicao[os.cidade]) distribuicao[os.cidade] = { total: 0, bairros: new Set(), vencidas: 0, equipes: new Set() };
+                    distribuicao[os.cidade].total++;
+                    distribuicao[os.cidade].bairros.add(os.bairro);
+                    if (os.diasVencido > 0) distribuicao[os.cidade].vencidas++;
+                    if (os.equipe) distribuicao[os.cidade].equipes.add(os.equipe);
+                });
+
+                let cidadesOrdenadas = Object.entries(distribuicao).sort((a,b) => b[1].total - a[1].total);
+                if (cidadesOrdenadas.length > 0) {
+                    html += `<div class="adv-section">
+                        <div class="adv-section-header">
+                            <span class="adv-priority adv-priority-high">ANÁLISE</span>
+                            📊 Concentração Geográfica por Cidade
+                        </div>
+                        <div class="adv-section-body">`;
+                    cidadesOrdenadas.forEach(([cidade, data]) => {
+                        let pctVencidas = data.total > 0 ? Math.round(data.vencidas / data.total * 100) : 0;
+                        let barColor = pctVencidas > 50 ? 'var(--danger)' : pctVencidas > 25 ? '#f97316' : pctVencidas > 0 ? 'var(--warning)' : 'var(--success)';
+                        html += `<div class="adv-trip-card" style="border-left-color:${barColor};">
+                            <div class="adv-trip-header">
+                                🏙️ ${cidade}
+                                <span style="font-size:11px;font-weight:500;color:var(--text-sub);">${data.total} OS · ${data.bairros.size} bairros · ${data.equipes.size} equipe${data.equipes.size !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div class="adv-trip-detail">
+                                <strong>Vencidas:</strong> ${data.vencidas}/${data.total} (${pctVencidas}%)
+                                <div class="adv-coverage-bar"><div class="adv-coverage-fill" style="width:${pctVencidas}%;background:${barColor};"></div></div>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div></div>';
+                }
+
+                // ======== SECTION 3: EQUIPES — CARGA E EFICIÊNCIA ========
+                let equipeAnalysis = lastRotasEquipes.map(re => {
+                    let vencidasNaRota = re.rota.filter(os => os.diasVencido > 0).length;
+                    let cidadesAtendidas = [...new Set(re.rota.map(o => o.cidade))];
+                    let distTotal = 0;
+                    for (let i = 1; i < re.rota.length; i++) {
+                        distTotal += haversine(re.rota[i-1].lat, re.rota[i-1].lng, re.rota[i].lat, re.rota[i].lng);
+                    }
+                    return { nome: re.equipe.nome, cor: re.equipe.cor, atributos: re.equipe.atributos, qtd: re.rota.length, vencidas: vencidasNaRota, cidades: cidadesAtendidas, distKm: distTotal.toFixed(1) };
+                });
+
+                if (equipeAnalysis.some(e => e.qtd > 0)) {
+                    html += `<div class="adv-section">
+                        <div class="adv-section-header">
+                            <span class="adv-priority adv-priority-medium">EQUIPES</span>
+                            🚐 Análise de Carga e Eficiência
+                        </div>
+                        <div class="adv-section-body">`;
+                    equipeAnalysis.filter(e => e.qtd > 0).forEach(eq => {
+                        let cargaPct = Math.round(eq.qtd / 6 * 100);
+                        let cargaColor = cargaPct >= 100 ? 'var(--danger)' : cargaPct >= 66 ? '#f97316' : 'var(--success)';
+                        html += `<div class="adv-trip-card" style="border-left-color:${eq.cor};">
+                            <div class="adv-trip-header">
+                                <span style="color:${eq.cor};">●</span> ${eq.nome}
+                                <span style="font-size:11px;font-weight:500;color:var(--text-sub);">${eq.atributos.join(' · ') || 'Padrão'}</span>
+                            </div>
+                            <div class="adv-trip-detail">
+                                <strong>Carga:</strong> ${eq.qtd}/6 OS (${cargaPct}%)
+                                <div class="adv-coverage-bar"><div class="adv-coverage-fill" style="width:${cargaPct}%;background:${cargaColor};"></div></div>
+                                <strong>Vencidas na rota:</strong> ${eq.vencidas} · <strong>Dist. total:</strong> ~${eq.distKm} km · <strong>Cidades:</strong> ${eq.cidades.join(', ')}
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div></div>';
+                }
+
+                // ======== SECTION 4: BAIRROS SEM MAPEAMENTO ========
+                if (lastPendencias.length > 0) {
+                    let porCidadePend = {};
+                    lastPendencias.forEach(os => {
+                        let key = os.cidade;
+                        if (!porCidadePend[key]) porCidadePend[key] = { bairros: new Set(), oss: [] };
+                        porCidadePend[key].bairros.add(os.bairro);
+                        porCidadePend[key].oss.push(os);
+                    });
+
+                    html += `<div class="adv-section">
+                        <div class="adv-section-header">
+                            <span class="adv-priority adv-priority-high">PENDÊNCIA</span>
+                            📍 Bairros Sem Mapeamento — Impedem Roteirização
+                        </div>
+                        <div class="adv-section-body">`;
+                    Object.entries(porCidadePend).sort((a,b) => b[1].oss.length - a[1].oss.length).forEach(([cidade, data]) => {
+                        let maxVenc = Math.max(...data.oss.map(o => o.diasVencido));
+                        html += `<div class="adv-trip-card" style="border-left-color:#f97316;">
+                            <div class="adv-trip-header">📍 ${cidade} — ${data.bairros.size} bairro${data.bairros.size > 1 ? 's' : ''} sem mapa</div>
+                            <div class="adv-trip-detail">
+                                <strong>Bairros:</strong> ${[...data.bairros].slice(0,6).join(', ')}${data.bairros.size > 6 ? ` (+${data.bairros.size-6})` : ''}<br>
+                                <strong>OS afetadas:</strong> ${data.oss.length} · <strong>Max. vencida:</strong> ${maxVenc > 0 ? maxVenc + ' dias' : 'No prazo'}<br>
+                                <strong>Ação:</strong> Mapear estes bairros clicando no mapa para desbloquear as OS.
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div></div>';
+                }
+            }
+
+            // ======== SECTION 5: COBERTURA DE MAPEAMENTO ========
+            html += `<div class="adv-section">
+                <div class="adv-section-header">
+                    <span class="adv-priority adv-priority-low">COBERTURA</span>
+                    🗺️ Cobertura de Mapeamento
+                </div>
+                <div class="adv-section-body">`;
+            
+            if (cidades.length === 0) {
+                html += `<div class="adv-tip"><strong>⚠️ Sem dados:</strong> Nenhum bairro mapeado ainda. Clique no mapa para começar a mapear bairros.</div>`;
+            } else {
+                // Show cities with fewest bairros mapped
+                let cidadesPorBairros = cidades.map(c => ({ cidade: c, count: Object.keys(dbBairros[c]).length })).sort((a,b) => a.count - b.count);
+                cidadesPorBairros.forEach(item => {
+                    let barWidth = Math.min(100, item.count * 5);
+                    let color = item.count < 5 ? 'var(--warning)' : item.count < 15 ? 'var(--info)' : 'var(--success)';
+                    html += `<div style="margin-bottom:8px;">
+                        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px;">
+                            <strong>${item.cidade}</strong>
+                            <span style="color:var(--text-sub);font-family:'JetBrains Mono',monospace;font-size:11px;">${item.count} bairros</span>
+                        </div>
+                        <div class="adv-coverage-bar"><div class="adv-coverage-fill" style="width:${barWidth}%;background:${color};"></div></div>
+                    </div>`;
+                });
+            }
+            html += '</div></div>';
+
+            // ======== SECTION 6: RECOMENDAÇÕES ESTRATÉGICAS ========
+            html += `<div class="adv-section">
+                <div class="adv-section-header">
+                    <span class="adv-priority adv-priority-tip">DICAS</span>
+                    💡 Recomendações Estratégicas
+                </div>
+                <div class="adv-section-body">`;
+
+            let tips = [];
+
+            // Tip: Equipes insuficientes
+            if (numEquipes === 0) {
+                tips.push({ icon: '🚐', text: '<strong>Cadastre equipes</strong> no painel à esquerda antes de roteirizar. Sem equipes, nenhuma OS pode ser alocada.' });
+            } else if (numEquipes < 3) {
+                tips.push({ icon: '🚐', text: `Você tem apenas <strong>${numEquipes} equipe(s)</strong>. Para uma distribuição eficiente, considere cadastrar pelo menos 3 equipes com atributos variados.` });
+            }
+
+            // Tip: No retro team
+            if (numEquipes > 0 && !equipes.some(e => e.atributos.includes('Retro'))) {
+                tips.push({ icon: '🚜', text: '<strong>Nenhuma equipe Retro cadastrada.</strong> Se houver OS do tipo Retro na planilha, elas não poderão ser alocadas. Considere adicionar uma equipe com atributo "Retro".' });
+            }
+
+            // Tip: No pegar cedo team
+            if (numEquipes > 0 && !equipes.some(e => e.atributos.includes('Pegar cedo'))) {
+                tips.push({ icon: '☀️', text: '<strong>Nenhuma equipe com "Pegar cedo".</strong> OS que exigem retirada especial matutina ficarão sem alocação.' });
+            }
+
+            // Tip: Overdue in queue
+            if (lastVencidasNaFila && lastVencidasNaFila.length > 0) {
+                tips.push({ icon: '⏰', text: `<strong>${lastVencidasNaFila.length} OS vencidas na fila de espera.</strong> Considere criar equipes temporárias adicionais ou aumentar o limite máximo de OS por equipe para absorver a demanda.` });
+            }
+
+            // Tip: Geographic spread
+            if (cidades.length > 3) {
+                tips.push({ icon: '🌐', text: `Seus bairros cobrem <strong>${cidades.length} cidades</strong>. Para evitar viagens longas, tente agrupar equipes por região geográfica usando o filtro "Forçar equipe na mesma Cidade".` });
+            }
+
+            // Tip: Low mapping
+            if (totalBairros < 10 && totalBairros > 0) {
+                tips.push({ icon: '📍', text: `Apenas <strong>${totalBairros} bairros</strong> mapeados. Quanto mais bairros mapeados, menos OS ficarão na lista "Sem Mapa". Dedique tempo para mapear os bairros mais recorrentes.` });
+            }
+
+            // Tip: Balanced routing
+            if (lastRotasEquipes.length > 0) {
+                let cargas = lastRotasEquipes.map(r => r.rota.length);
+                let maxC = Math.max(...cargas), minC = Math.min(...cargas);
+                if (maxC - minC >= 3) {
+                    tips.push({ icon: '⚖️', text: `<strong>Carga desbalanceada:</strong> diferença de ${maxC - minC} OS entre equipes. Use o modal de Prioridades para forçar alocações manuais e equilibrar a distribuição.` });
+                }
+            }
+
+            if (tips.length === 0) {
+                tips.push({ icon: '✅', text: '<strong>Tudo parece bem configurado!</strong> Continue monitorando as análises após cada roteirização para manter a eficiência.' });
+            }
+
+            tips.forEach(tip => {
+                html += `<div class="adv-tip">${tip.icon} ${tip.text}</div>`;
+            });
+
+            html += '</div></div>';
+
+            content.innerHTML = html;
+        }, 400);
     }
 
     // === AUTO-LOAD from GitHub on startup ===
