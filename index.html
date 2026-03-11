@@ -782,7 +782,7 @@
         </div>
         <div class="dm-input-row">
             <label>Nome do arquivo JSON</label>
-            <input type="text" id="dmGhFile" placeholder="backup_roteirizador.json" value="backup_roteirizador.json">
+            <input type="text" id="dmGhFile" placeholder="backup.json" value="backup.json">
         </div>
         <div class="dm-input-row">
             <label>Branch</label>
@@ -900,7 +900,7 @@
 
     function exportarBackup() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({dbBairros, equipes}, null, 2));
-        const a = document.createElement('a'); a.href = dataStr; a.download = "backup_roteirizador_completo.json";
+        const a = document.createElement('a'); a.href = dataStr; a.download = "backup.json";
         document.body.appendChild(a); a.click(); a.remove();
     }
     
@@ -1821,13 +1821,13 @@
     // =====================================================
     // === DATA MANAGEMENT - GitHub Sync
     // =====================================================
-    let ghConfig = JSON.parse(localStorage.getItem('ghConfig') || 'null') || { token: '', repo: '', file: 'backup_roteirizador.json', branch: 'main' };
+    let ghConfig = JSON.parse(localStorage.getItem('ghConfig') || 'null') || { token: '', repo: '', file: 'backup.json', branch: 'main' };
 
     function abrirDataMgmt() {
         // Populate fields
         document.getElementById('dmGhToken').value = ghConfig.token;
         document.getElementById('dmGhRepo').value = ghConfig.repo;
-        document.getElementById('dmGhFile').value = ghConfig.file || 'backup_roteirizador.json';
+        document.getElementById('dmGhFile').value = ghConfig.file || 'backup.json';
         document.getElementById('dmGhBranch').value = ghConfig.branch || 'main';
         atualizarDmStatus();
         atualizarDmDataPreview();
@@ -1869,7 +1869,7 @@
     function dmSalvarConfig() {
         ghConfig.token = document.getElementById('dmGhToken').value.trim();
         ghConfig.repo = document.getElementById('dmGhRepo').value.trim();
-        ghConfig.file = document.getElementById('dmGhFile').value.trim() || 'backup_roteirizador.json';
+        ghConfig.file = document.getElementById('dmGhFile').value.trim() || 'backup.json';
         ghConfig.branch = document.getElementById('dmGhBranch').value.trim() || 'main';
         localStorage.setItem('ghConfig', JSON.stringify(ghConfig));
         atualizarDmStatus();
