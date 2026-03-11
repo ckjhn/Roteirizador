@@ -3,329 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roteirizador de OS - Excel e Backup</title>
+    <title>Roteirizador PRO MAX - Regras de Observação</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f9f9f9; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1, h2 { color: #333; }
-        
-        /* Controles superiores */
-        .panel { background: #e8eaf6; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
-        .bloco-controle { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); flex: 1; min-width: 250px; }
-        .bloco-controle h3 { margin-top: 0; font-size: 14px; color: #555; margin-bottom: 10px; }
-        
-        button { padding: 8px 12px; background: #6200ea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 5px; }
-        button:hover { background: #3700b3; }
-        .btn-backup { background: #00897b; }
-        .btn-backup:hover { background: #00695c; }
-        
-        /* Mapa */
-        #map { height: 500px; width: 100%; border-radius: 8px; border: 2px solid #ddd; z-index: 1; }
-        
-        /* Modal */
-        #modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; width: 300px; }
-        #modal h3 { margin-top: 0; }
-        #modal input { width: 90%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase; }
-        #modalOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        :root { --bg-color: #f0f2f5; --text-color: #333; --panel-bg: #fff; --border-color: #ddd; --header-bg: #6200ea; --header-bg-2: #0277bd; --btn-bg: #6200ea; --btn-hover: #3700b3; --table-header: #333; --table-row-alt: #f1f1f1; --input-bg: #fff; --input-border: #ccc; }
+        body.dark-mode { --bg-color: #121212; --text-color: #e0e0e0; --panel-bg: #1e1e1e; --border-color: #444; --header-bg: #4a148c; --header-bg-2: #01579b; --btn-bg: #7c4dff; --btn-hover: #651fff; --table-header: #212121; --table-row-alt: #2c2c2c; --input-bg: #333; --input-border: #555; }
 
-        /* Tabela */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #6200ea; color: white; }
-        .pendencia { color: red; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+        .container { max-width: 1400px; margin: auto; background: var(--panel-bg); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative; }
+        h1, h2, h3 { color: var(--text-color); }
+        
+        #themeToggle { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-color); }
+        
+        .painel-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .bloco { background: var(--panel-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+        .bloco-header { background: var(--header-bg); color: white; padding: 10px; margin: -15px -15px 15px -15px; border-radius: 8px 8px 0 0; font-weight: bold; }
+        .bloco-header.config { background: var(--header-bg-2); }
+        
+        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 15px; background: var(--btn-bg); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s; }
+        button:hover { background: var(--btn-hover); }
+        button.secundario { background: #00897b; margin-top: 5px; }
+        button.secundario:hover { background: #00695c; }
+        button.remover { background: #d32f2f; padding: 5px 10px; width: auto; font-size: 12px; }
+        
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; padding: 10px; background: rgba(128, 128, 128, 0.1); border-radius: 5px; }
+        .checkbox-group label { display: flex; align-items: center; font-size: 13px; cursor: pointer; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color);}
+        .checkbox-group input { width: auto; margin-right: 5px; margin-bottom: 0; }
+
+        .config-area label { display: flex; align-items: center; font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+        .config-area input[type="checkbox"] { width: auto; margin-right: 10px; transform: scale(1.2); }
+
+        #listaEquipes { list-style: none; padding: 0; margin: 0; flex-grow: 1; overflow-y: auto; max-height: 150px; }
+        #listaEquipes li { background: var(--table-row-alt); padding: 8px; margin-bottom: 5px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-left: 4px solid var(--btn-bg); }
+        
+        #map { height: 500px; width: 100%; border-radius: 8px; border: 2px solid var(--border-color); z-index: 1; }
+        
+        #modal, #modalOverlay { display: none; position: fixed; }
+        #modal { top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel-bg); color: var(--text-color); padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 1000; width: 300px; border: 1px solid var(--border-color); }
+        #modalOverlay { top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; white-space: nowrap; color: var(--text-color); }
+        th { background-color: var(--table-header); color: white; }
+        .row-equipe td { background-color: var(--table-row-alt); font-weight: bold; border-top: 2px solid var(--btn-bg); }
+        
+        /* Badges de Regras Especiais */
+        .badge { font-size: 10px; padding: 2px 6px; border-radius: 10px; color: white; font-weight: bold; margin-left: 5px; display: inline-block;}
+        .badge-cedo { background: #ff9800; }
+        .badge-retro { background: #795548; }
+        .badge-rede { background: #f44336; }
+        
+        @media (max-width: 900px) { .painel-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Roteirizador de OS</h1>
+    <button id="themeToggle" onclick="toggleTheme()" title="Alternar Tema">🌙</button>
+    <h1>🚀 Roteirizador PRO MAX</h1>
     
-    <div class="panel">
-        <div class="bloco-controle">
-            <h3>📂 1. Carregar Planilha (.xlsx)</h3>
-            <input type="file" id="excelFile" accept=".xlsx, .xls">
-            <button onclick="processarExcel()" style="width: 100%; margin-top: 10px;">Processar Rotas</button>
+    <div class="painel-grid">
+        <div class="bloco">
+            <div class="bloco-header">👥 1. Equipes</div>
+            <input type="text" id="nomeEquipe" placeholder="Nome (Ex: Alfa - 01)">
+            <div class="checkbox-group" id="atributosEquipe">
+                <label><input type="checkbox" value="Pegar cedo"> Pegar cedo</label>
+                <label><input type="checkbox" value="Retro"> Retro</label>
+                <label><input type="checkbox" value="Desempenho"> Desempenho</label>
+                <label><input type="checkbox" value="Dando apoio"> Apoio (Dar)</label>
+                <label><input type="checkbox" value="Recebendo apoio"> Apoio (Receber)</label>
+            </div>
+            <button onclick="adicionarEquipe()">+ Adicionar</button>
+            <ul id="listaEquipes" style="margin-top: 15px;"></ul>
         </div>
-        
-        <div class="bloco-controle">
-            <h3>💾 2. Backup do Mapa</h3>
-            <button class="btn-backup" onclick="exportarJSON()">Exportar Bairros (Baixar .json)</button>
-            <br>
-            <input type="file" id="importJson" accept=".json" style="display:none" onchange="importarJSON(event)">
-            <button class="btn-backup" onclick="document.getElementById('importJson').click()">Importar Backup (.json)</button>
+
+        <div class="bloco config-area">
+            <div class="bloco-header config">⚙️ 2. Regras de Negócio</div>
+            
+            <label style="margin-top: 10px;">Raio Máx. entre OS (Km):</label>
+            <input type="number" id="configMaxDist" value="20" min="1" max="100">
+            
+            <div style="margin-top: 15px; padding: 10px; background: rgba(255, 152, 0, 0.1); border-left: 4px solid #ff9800; border-radius: 4px;">
+                <label style="cursor: pointer; margin-bottom: 0;">
+                    <input type="checkbox" id="configTravarCidade" checked>
+                    Forçar equipe na mesma Cidade
+                </label>
+            </div>
+        </div>
+
+        <div class="bloco">
+            <div class="bloco-header">📂 3. Roteirização e Mapa</div>
+            <label>Carregar Planilha (.xlsx):</label>
+            <input type="file" id="excelFile" accept=".xlsx, .xls">
+            <button onclick="processarExcel()" style="margin-bottom: 15px; background: #00c853;">🗺️ Gerar Rota Inteligente</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: auto;">
+                <button class="secundario" onclick="exportarJSON()">💾 Exp. Mapa</button>
+                <input type="file" id="importJson" accept=".json" style="display:none" onchange="importarJSON(event)">
+                <button class="secundario" onclick="document.getElementById('importJson').click()">📁 Imp. Mapa</button>
+            </div>
         </div>
     </div>
 
     <div id="alertArea" style="margin-bottom: 15px;"></div>
-
     <div id="map"></div>
 
-    <h2 style="margin-top: 30px;">Rota e Detalhes da OS</h2>
-    <table id="tabelaRotas">
-        <thead>
-            <tr>
-                <th>Ordem</th>
-                <th>Matrícula</th>
-                <th>OS</th>
-                <th>Cidade</th>
-                <th>Bairro</th>
-                <th>Observação 1</th>
-                <th>Observação 2</th>
-                <th>Status do Mapa</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
-    </table>
+    <div class="table-responsive">
+        <h2>📊 Tabela de Despacho</h2>
+        <table id="tabelaRotas">
+            <thead>
+                <tr>
+                    <th>Equipe</th>
+                    <th>#</th>
+                    <th>OS</th>
+                    <th>Cidade</th>
+                    <th>Bairro</th>
+                    <th>Classificação</th>
+                    <th>Geração</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <div id="modalOverlay"></div>
 <div id="modal">
     <h3>Mapear Novo Bairro</h3>
-    <label>Cidade:</label>
-    <input type="text" id="inputCidade" placeholder="Ex: CAMPINAS">
-    <label>Bairro:</label>
-    <input type="text" id="inputBairro" placeholder="Ex: CAMBUI">
-    <div style="display: flex; justify-content: space-between;">
+    <input type="text" id="inputCidade" placeholder="CIDADE">
+    <input type="text" id="inputBairro" placeholder="BAIRRO">
+    <div style="display: flex; justify-content: space-between; gap: 10px;">
         <button onclick="salvarBairro()">Salvar Local</button>
         <button onclick="fecharModal()" style="background: #999;">Cancelar</button>
     </div>
 </div>
 
 <script>
-    // --- 1. BANCO DE DADOS (LocalStorage) E BACKUP ---
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        document.getElementById('themeToggle').innerText = isDark ? '☀️' : '🌙';
+        localStorage.setItem('temaEscuro', isDark);
+    }
+    if (localStorage.getItem('temaEscuro') === 'true') toggleTheme();
+
+    let equipes = [];
+    const coresRotas = ['#E53935', '#1E88E5', '#43A047', '#8E24AA', '#F4511E', '#00ACC1', '#3949AB'];
+    let polylineLayers = [];
+
+    function adicionarEquipe() {
+        let nome = document.getElementById('nomeEquipe').value.trim();
+        if (!nome) { alert("Digite o nome da equipe."); return; }
+        
+        let checkboxes = document.querySelectorAll('#atributosEquipe input[type="checkbox"]:checked');
+        let atributosSelecionados = Array.from(checkboxes).map(cb => cb.value);
+        let atributoTxt = atributosSelecionados.length > 0 ? atributosSelecionados.join(' | ') : 'Padrão';
+        
+        // Extrai o número da equipe (ex: Alfa - 01 -> "01")
+        let numEquipeMatch = nome.match(/-\s*(\d+)/);
+        let idNumero = numEquipeMatch ? numEquipeMatch[1].trim() : null;
+
+        let cor = coresRotas[equipes.length % coresRotas.length];
+        equipes.push({ nome, atributo: atributoTxt, cor, idNumero });
+        
+        document.getElementById('nomeEquipe').value = '';
+        checkboxes.forEach(cb => cb.checked = false);
+        atualizarListaEquipes();
+    }
+
+    function removerEquipe(index) { equipes.splice(index, 1); atualizarListaEquipes(); }
+
+    function atualizarListaEquipes() {
+        let ul = document.getElementById('listaEquipes');
+        ul.innerHTML = '';
+        equipes.forEach((eq, index) => {
+            ul.innerHTML += `<li>
+                <span><span style="color:${eq.cor}; font-size:16px;">■</span> <strong>${eq.nome}</strong> <span style="font-size:11px; color:#888;">(${eq.atributo})</span></span>
+                <button class="remover" onclick="removerEquipe(${index})">X</button>
+            </li>`;
+        });
+    }
+
     let dbBairros = JSON.parse(localStorage.getItem('dbBairros')) || {};
-    
-    function exportarJSON() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dbBairros, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "backup_bairros_roteirizador.json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
+    function exportarJSON() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dbBairros, null, 2)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "backup_mapa.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+    function importarJSON(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { dbBairros = { ...dbBairros, ...JSON.parse(e.target.result) }; localStorage.setItem('dbBairros', JSON.stringify(dbBairros)); alert("Mapa atualizado!"); location.reload(); }; reader.readAsText(file); }
 
-    function importarJSON(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const dadosImportados = JSON.parse(e.target.result);
-                // Mescla os dados importados com os existentes
-                dbBairros = { ...dbBairros, ...dadosImportados };
-                localStorage.setItem('dbBairros', JSON.stringify(dbBairros));
-                alert("Backup importado com sucesso! O mapa será atualizado.");
-                location.reload();
-            } catch (error) {
-                alert("Erro ao ler o arquivo JSON. Certifique-se de que é um backup válido.");
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    // --- 2. INICIALIZAÇÃO DO MAPA ---
-    let tempLat = null, tempLng = null, marcadores = [], polylineRota = null;
-    const map = L.map('map').setView([-14.235, -51.925], 4);
-    
+    let tempLat = null, tempLng = null;
+    const map = L.map('map').setView([-22.85, -42.05], 10); 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    function carregarMarcadoresSalvos() {
-        for (const cidade in dbBairros) {
-            for (const bairro in dbBairros[cidade]) {
-                const coords = dbBairros[cidade][bairro];
-                adicionarMarcadorVisual(coords.lat, coords.lng, `${bairro} (${cidade})`);
-            }
-        }
-    }
-    carregarMarcadoresSalvos();
+    for (const cid in dbBairros) { for (const bai in dbBairros[cid]) { L.marker([dbBairros[cid][bai].lat, dbBairros[cid][bai].lng]).addTo(map).bindPopup(`${bai} (${cid})`); } }
 
-    map.on('click', function(e) {
-        tempLat = e.latlng.lat;
-        tempLng = e.latlng.lng;
-        document.getElementById('modal').style.display = 'block';
-        document.getElementById('modalOverlay').style.display = 'block';
-        document.getElementById('inputCidade').focus();
-    });
+    map.on('click', function(e) { tempLat = e.latlng.lat; tempLng = e.latlng.lng; document.getElementById('modal').style.display = 'block'; document.getElementById('modalOverlay').style.display = 'block'; });
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; document.getElementById('modalOverlay').style.display = 'none'; }
+    function salvarBairro() { let c = document.getElementById('inputCidade').value.trim().toUpperCase(); let b = document.getElementById('inputBairro').value.trim().toUpperCase(); if(!c || !b) return; if (!dbBairros[c]) dbBairros[c] = {}; dbBairros[c][b] = { lat: tempLat, lng: tempLng }; localStorage.setItem('dbBairros', JSON.stringify(dbBairros)); L.marker([tempLat, tempLng]).addTo(map).bindPopup(`${b} (${c})`); fecharModal(); }
 
-    function fecharModal() {
-        document.getElementById('modal').style.display = 'none';
-        document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('inputCidade').value = '';
-        document.getElementById('inputBairro').value = '';
-    }
-
-    function salvarBairro() {
-        let cidade = document.getElementById('inputCidade').value.trim().toUpperCase();
-        let bairro = document.getElementById('inputBairro').value.trim().toUpperCase();
-
-        if(!cidade || !bairro) { alert("Preencha cidade e bairro!"); return; }
-
-        if (!dbBairros[cidade]) dbBairros[cidade] = {};
-        dbBairros[cidade][bairro] = { lat: tempLat, lng: tempLng };
-        localStorage.setItem('dbBairros', JSON.stringify(dbBairros));
-
-        adicionarMarcadorVisual(tempLat, tempLng, `${bairro} (${cidade})`);
-        fecharModal();
-    }
-
-    function adicionarMarcadorVisual(lat, lng, texto) {
-        let marker = L.marker([lat, lng]).addTo(map).bindPopup(texto);
-        marcadores.push(marker);
-    }
-
-    // --- 3. PROCESSAR EXCEL E ROTEIRIZAR ---
     function processarExcel() {
+        if (equipes.length === 0) { alert("Adicione pelo menos uma equipe primeiro!"); return; }
         const fileInput = document.getElementById('excelFile');
-        const file = fileInput.files[0];
-
-        if (!file) { alert("Selecione um arquivo Excel (.xlsx)"); return; }
-
+        if (!fileInput.files[0]) { alert("Selecione um arquivo Excel"); return; }
         const reader = new FileReader();
         reader.onload = function(e) {
             const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            
-            // Pega a primeira aba da planilha
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            
-            // Converte para JSON
-            const ordens = XLSX.utils.sheet_to_json(worksheet);
-            cruzarDados(ordens);
+            const workbook = XLSX.read(data, {type: 'array', cellDates: true});
+            const ordens = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+            cruzarDadosEAplicarAlgoritmo(ordens);
         };
-        reader.readAsArrayBuffer(file);
+        reader.readAsArrayBuffer(fileInput.files[0]);
     }
 
-    function cruzarDados(ordens) {
-        let pontosValidos = [];
-        let pendencias = [];
+    function parseDateCustom(val) {
+        if (!val) return new Date();
+        if (val instanceof Date) return val;
+        if (typeof val === 'number') return new Date(Math.round((val - 25569)*86400*1000));
+        let parts = String(val).split('/');
+        if(parts.length === 3) return new Date(parts[2], parts[1]-1, parts[0]);
+        return new Date(val);
+    }
+
+    function cruzarDadosEAplicarAlgoritmo(ordens) {
+        let validOS = []; let pendencias = []; let today = new Date(); 
 
         ordens.forEach(os => {
-            // Tratamento das colunas baseadas no seu modelo
-            let matricula = os['Matricula'] || os['Matrícula'] || '-';
             let numOS = os['OS'] || '-';
-            let cidadeOS = (os['Cidade'] || '').trim().toUpperCase();
-            let bairroOS = (os['Bairro'] || '').trim().toUpperCase();
-            let obs1 = os['Observação 1'] || os['Observacao 1'] || '';
-            let obs2 = os['Observação 2'] || os['Observacao 2'] || '';
+            let cidade = (os['Cidade'] || '').trim().toUpperCase();
+            let bairro = (os['Bairro'] || '').trim().toUpperCase();
+            let dGeracao = parseDateCustom(os['Data de Geração'] || os['Data de Geracao']);
+            let dVenc = parseDateCustom(os['Data de Vencimento']);
+            
+            // Leitura avançada das Observações
+            let obs1 = (os['Observação 1'] || os['Observacao 1'] || '').toString().toUpperCase();
+            let obs2 = (os['Observação 2'] || os['Observacao 2'] || '').toString().toUpperCase();
+            let fullObs = obs1 + " " + obs2;
 
-            let osData = { matricula, os: numOS, cidade: cidadeOS, bairro: bairroOS, obs1, obs2 };
+            let isPegarCedo = fullObs.includes('PEGAR CEDO');
+            let isRetro = fullObs.includes('RETRO');
+            
+            // Regex para extrair números dentro de colchetes ex: REDE NÃO LOCALIZADA [01, 02]
+            let redeMatch = fullObs.match(/REDE N.O LOCALIZADA\s*\[(.*?)\]/);
+            let isRedeNaoLocalizada = !!redeMatch;
+            let canceladasPor = redeMatch ? redeMatch[1].split(',').map(s => s.trim()) : [];
+            
+            // Score Base (Urgência)
+            let diasGeracao = Math.floor((today - dGeracao) / (1000 * 60 * 60 * 24));
+            let diasVencido = Math.floor((today - dVenc) / (1000 * 60 * 60 * 24));
+            let score = 0;
+            if (diasGeracao > 0) score += (diasGeracao * 2); 
+            if (diasVencido > 0) score += (diasVencido * 15); 
+            else score += (diasVencido * 5); 
 
-            if (dbBairros[cidadeOS] && dbBairros[cidadeOS][bairroOS]) {
-                osData.lat = dbBairros[cidadeOS][bairroOS].lat;
-                osData.lng = dbBairros[cidadeOS][bairroOS].lng;
-                pontosValidos.push(osData);
-            } else {
-                pendencias.push(osData);
-            }
+            let osData = { 
+                os: numOS, cidade, bairro, geracao: dGeracao.toLocaleDateString(), vencimento: dVenc.toLocaleDateString(), 
+                rawScore: score, isPegarCedo, isRetro, isRedeNaoLocalizada, canceladasPor 
+            };
+
+            if (dbBairros[cidade] && dbBairros[cidade][bairro]) {
+                osData.lat = dbBairros[cidade][bairro].lat;
+                osData.lng = dbBairros[cidade][bairro].lng;
+                validOS.push(osData);
+            } else { pendencias.push(osData); }
         });
 
-        exibirPendencias(pendencias);
-        calcularRotaProximidade(pontosValidos, pendencias);
-    }
+        // --- MOTOR DE DECISÃO COM REGRAS ESTRITAS ---
+        const maxDist = parseFloat(document.getElementById('configMaxDist').value) || 20;
+        const travarCidade = document.getElementById('configTravarCidade').checked;
 
-    function exibirPendencias(pendencias) {
-        let alertArea = document.getElementById('alertArea');
-        if (pendencias.length > 0) {
-            let msg = `<div style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px;">
-                <strong>Atenção:</strong> ${pendencias.length} bairros da planilha não estão no seu mapa! Cadastre-os:
-                <ul style="margin-top: 5px; margin-bottom: 0;">`;
-            pendencias.forEach(p => msg += `<li>OS ${p.os} - ${p.cidade} / ${p.bairro}</li>`);
-            msg += `</ul></div>`;
-            alertArea.innerHTML = msg;
-        } else {
-            alertArea.innerHTML = '';
-        }
+        let unassigned = [...validOS];
+        // Ordena tudo pela urgência primária
+        unassigned.sort((a, b) => b.rawScore - a.rawScore);
+
+        let rotasEquipes = [];
+
+        equipes.forEach(equipe => {
+            let rota = [];
+            let isEqRetro = equipe.atributo.includes('Retro');
+            let isEqCedo = equipe.atributo.includes('Pegar cedo');
+            let isEqDesempenho = equipe.atributo.includes('Desempenho');
+            let temPegarCedoNaRota = false;
+            let cidadeBaseEquipe = null;
+
+            while (rota.length < 6 && unassigned.length > 0) {
+                let bestScore = -Infinity;
+                let bestIndex = -1;
+
+                for (let i = 0; i < unassigned.length; i++) {
+                    let candidate = unassigned[i];
+                    
+                    // ==========================================
+                    // 1. REGRAS DE BLOQUEIO ABSOLUTO (Filtros Estritos)
+                    // ==========================================
+                    
+                    // A) Regra Retro: Equipe Retro SÓ faz Retro ou Rede Não Localizada. Equipe normal NÃO faz Retro.
+                    if (isEqRetro && !candidate.isRetro && !candidate.isRedeNaoLocalizada) continue;
+                    if (!isEqRetro && candidate.isRetro) continue;
+                    
+                    // B) Regra Rede Cancelada: Se a equipe cancelou, ela NÃO pode pegar de novo.
+                    if (candidate.isRedeNaoLocalizada && equipe.idNumero && candidate.canceladasPor.includes(equipe.idNumero)) continue;
+                    
+                    // C) Regra Pegar Cedo: Só equipe Pegar Cedo faz, e máximo de 1 por rota.
+                    if (candidate.isPegarCedo && !isEqCedo) continue;
+                    if (candidate.isPegarCedo && temPegarCedoNaRota) continue;
+
+                    // D) Regra Geográfica (A partir da 2ª OS)
+                    if (rota.length > 0) {
+                        if (travarCidade && candidate.cidade !== cidadeBaseEquipe) continue;
+                        let distKm = calcularDistancia(rota[rota.length-1].lat, rota[rota.length-1].lng, candidate.lat, candidate.lng);
+                        if (distKm > maxDist) continue;
+                    }
+
+                    // ==========================================
+                    // 2. SISTEMA DE PONTUAÇÃO (Pesos Gravitacionais)
+                    // ==========================================
+                    let score = candidate.rawScore;
+
+                    // Se for a 1ª OS do dia, e a equipe é "Pegar Cedo", FORÇA a OS de pegar cedo lá pro topo.
+                    if (rota.length === 0 && isEqCedo && candidate.isPegarCedo) {
+                        score += 100000;
+                    }
+                    
+                    // Se for Rede Não Localizada, Desempenho e Retro tem preferência absurda
+                    if (candidate.isRedeNaoLocalizada) {
+                        if (isEqDesempenho) score += 50000;
+                        if (isEqRetro) score += 40000;
+                    }
+
+                    // Ajuste de distância (A partir da 2ª OS)
+                    if (rota.length > 0) {
+                        let distKm = calcularDistancia(rota[rota.length-1].lat, rota[rota.length-1].lng, candidate.lat, candidate.lng);
+                        let bonusCidade = (candidate.cidade === cidadeBaseEquipe) ? 5000 : 0;
+                        score = score + bonusCidade - (distKm * 100);
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestIndex = i;
+                    }
+                }
+
+                if (bestIndex !== -1) {
+                    let escolhida = unassigned.splice(bestIndex, 1)[0];
+                    if (escolhida.isPegarCedo) temPegarCedoNaRota = true;
+                    if (rota.length === 0) cidadeBaseEquipe = escolhida.cidade; // Define a cidade âncora
+                    
+                    rota.push(escolhida);
+                } else {
+                    break; // Fim da linha para esta equipe (acabou OS compatível ou extrapolou distância)
+                }
+            }
+            rotasEquipes.push({ equipe, rota });
+        });
+
+        desenharRotas(rotasEquipes);
+        preencherTabela(rotasEquipes, unassigned, pendencias);
     }
 
     function calcularDistancia(lat1, lon1, lat2, lon2) {
-        const R = 6371; 
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        const p = 0.017453292519943295; const c = Math.cos;
+        const a = 0.5 - c((lat2 - lat1) * p)/2 + c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))/2;
+        return 12742 * Math.asin(Math.sqrt(a));
     }
 
-    function calcularRotaProximidade(pontos, pendencias) {
-        if (pontos.length === 0) return;
-
-        let naoVisitados = [...pontos];
-        let rota = [];
-        
-        let atual = naoVisitados.shift();
-        rota.push(atual);
-
-        while (naoVisitados.length > 0) {
-            let idxMaisPerto = 0;
-            let distMinima = Infinity;
-
-            for (let i = 0; i < naoVisitados.length; i++) {
-                let dist = calcularDistancia(atual.lat, atual.lng, naoVisitados[i].lat, naoVisitados[i].lng);
-                if (dist < distMinima) {
-                    distMinima = dist;
-                    idxMaisPerto = i;
-                }
+    function desenharRotas(rotasEquipes) {
+        polylineLayers.forEach(layer => map.removeLayer(layer)); polylineLayers = [];
+        rotasEquipes.forEach(re => {
+            if(re.rota.length > 0) {
+                let latLngs = re.rota.map(p => [p.lat, p.lng]);
+                let poly = L.polyline(latLngs, {color: re.equipe.cor, weight: 6, opacity: 0.9}).addTo(map);
+                polylineLayers.push(poly);
             }
-            atual = naoVisitados.splice(idxMaisPerto, 1)[0];
-            rota.push(atual);
+        });
+        if(polylineLayers.length > 0) { let group = new L.featureGroup(polylineLayers); map.fitBounds(group.getBounds().pad(0.1)); }
+    }
+
+    function gerarBadges(os) {
+        let badges = '';
+        if (os.isPegarCedo) badges += '<span class="badge badge-cedo">☀️ Pegar Cedo</span>';
+        if (os.isRetro) badges += '<span class="badge badge-retro">🚜 Retro</span>';
+        if (os.isRedeNaoLocalizada) badges += '<span class="badge badge-rede">❌ Rede Ñ Localizada</span>';
+        return badges;
+    }
+
+    function preencherTabela(rotasEquipes, sobrou, pendencias) {
+        let tbody = document.querySelector("#tabelaRotas tbody"); tbody.innerHTML = "";
+
+        rotasEquipes.forEach(re => {
+            if(re.rota.length > 0) {
+                tbody.innerHTML += `<tr class="row-equipe"><td colspan="9" style="color:${re.equipe.cor}">🚐 ${re.equipe.nome} <span style="font-weight:normal; font-size: 12px; color:#777;">(${re.equipe.atributo})</span></td></tr>`;
+                re.rota.forEach((os, index) => {
+                    tbody.innerHTML += `<tr>
+                        <td>-</td><td><strong>${index + 1}º</strong></td><td>${os.os}</td><td>${os.cidade}</td><td>${os.bairro}</td>
+                        <td>${gerarBadges(os)}</td><td>${os.geracao}</td><td>${os.vencimento}</td>
+                        <td style="color: #4CAF50;">✔ Na Rota</td>
+                    </tr>`;
+                });
+            }
+        });
+
+        if(sobrou.length > 0) {
+            tbody.innerHTML += `<tr class="row-equipe"><td colspan="9" style="color:#ff9800">⚠️ Fila de Espera (Excesso, Bloqueios de Regras ou Distância)</td></tr>`;
+            sobrou.forEach(os => {
+                tbody.innerHTML += `<tr>
+                    <td>-</td><td>-</td><td>${os.os}</td><td>${os.cidade}</td><td>${os.bairro}</td>
+                    <td>${gerarBadges(os)}</td><td>${os.geracao}</td><td>${os.vencimento}</td>
+                    <td style="color: #ff9800;">Aguardando Manual</td>
+                </tr>`;
+            });
         }
 
-        desenharRotaNoMapa(rota);
-        preencherTabela(rota, pendencias);
-    }
-
-    function desenharRotaNoMapa(rota) {
-        if (polylineRota) map.removeLayer(polylineRota); 
-        let latLngs = rota.map(p => [p.lat, p.lng]);
-        polylineRota = L.polyline(latLngs, {color: 'blue', weight: 4}).addTo(map);
-        map.fitBounds(polylineRota.getBounds());
-    }
-
-    function preencherTabela(rota, pendencias) {
-        let tbody = document.querySelector("#tabelaRotas tbody");
-        tbody.innerHTML = "";
-
-        // Adiciona a rota calculada
-        rota.forEach((p, index) => {
-            let tr = `<tr>
-                <td><strong>${index + 1}º</strong></td>
-                <td>${p.matricula}</td>
-                <td>${p.os}</td>
-                <td>${p.cidade}</td>
-                <td>${p.bairro}</td>
-                <td>${p.obs1}</td>
-                <td>${p.obs2}</td>
-                <td style="color: green;">✔ Na Rota</td>
-            </tr>`;
-            tbody.innerHTML += tr;
-        });
-
-        // Adiciona as pendências
-        pendencias.forEach(p => {
-            let tr = `<tr style="background: #fff3f3; color: #777;">
-                <td>-</td>
-                <td>${p.matricula}</td>
-                <td>${p.os}</td>
-                <td>${p.cidade}</td>
-                <td>${p.bairro}</td>
-                <td>${p.obs1}</td>
-                <td>${p.obs2}</td>
-                <td class="pendencia">✖ Faltando no Mapa</td>
-            </tr>`;
-            tbody.innerHTML += tr;
-        });
+        if(pendencias.length > 0) {
+            tbody.innerHTML += `<tr class="row-equipe"><td colspan="9" style="color:#f44336">❌ Bairros Não Mapeados</td></tr>`;
+            pendencias.forEach(p => {
+                tbody.innerHTML += `<tr>
+                    <td>-</td><td>-</td><td>${p.os}</td><td>${p.cidade}</td><td>${p.bairro}</td>
+                    <td>-</td><td>${p.geracao}</td><td>${p.vencimento}</td>
+                    <td style="color: #f44336; font-weight: bold;">Sem Mapa</td>
+                </tr>`;
+            });
+        }
     }
 </script>
 
