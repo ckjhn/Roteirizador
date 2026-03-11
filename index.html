@@ -1146,6 +1146,40 @@
 
     function salvarEstadoGeral() { localStorage.setItem('appRoteirizadorData', JSON.stringify({ dbBairros, equipes })); }
 
+    // --- NORMALIZAÇÃO DE TEXTO (remove acentos, uppercase) ---
+    function normalizar(str) {
+        if (!str) return '';
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().trim();
+    }
+
+    // Busca bairro no dbBairros ignorando acentos e casing
+    // Retorna { cidade, bairro, dados } ou null
+    function buscarBairroNormalizado(cidadeRaw, bairroRaw) {
+        let cidadeN = normalizar(cidadeRaw);
+        let bairroN = normalizar(bairroRaw);
+
+        // Tentar match direto primeiro (mais rápido)
+        if (dbBairros[cidadeRaw] && dbBairros[cidadeRaw][bairroRaw]) {
+            return { cidade: cidadeRaw, bairro: bairroRaw, dados: dbBairros[cidadeRaw][bairroRaw] };
+        }
+
+        // Buscar cidade por normalização
+        let cidadeKey = null;
+        for (let c in dbBairros) {
+            if (normalizar(c) === cidadeN) { cidadeKey = c; break; }
+        }
+        if (!cidadeKey) return null;
+
+        // Buscar bairro por normalização
+        let bairroKey = null;
+        for (let b in dbBairros[cidadeKey]) {
+            if (normalizar(b) === bairroN) { bairroKey = b; break; }
+        }
+        if (!bairroKey) return null;
+
+        return { cidade: cidadeKey, bairro: bairroKey, dados: dbBairros[cidadeKey][bairroKey] };
+    }
+
     // --- GERENCIAMENTO DE EQUIPES ---
     const coresRotas = ['#4f5aff', '#ef4444', '#22c55e', '#a855f7', '#f97316', '#06b6d4', '#ec4899'];
     
@@ -1510,6 +1544,51 @@
         return novaRota;
     }
 
+    // Reordena rota usando OSRM trip (TSP por estrada)
+    // Se OSRM falhar, usa fallback por haversine
+    async function reordenarRotaPorEstrada(rota, startIndex) {
+        if (!rota || rota.length < 2) return rota;
+        
+        let fixedStart = (startIndex !== undefined && startIndex >= 0 && startIndex < rota.length) ? startIndex : 0;
+        
+        // Reorganizar array para que o ponto de partida seja o primeiro
+        let rotaOrdenada = [rota[fixedStart], ...rota.filter((_, i) => i !== fixedStart)];
+        
+        try {
+            let coords = rotaOrdenada.map(p => `${p.lng},${p.lat}`).join(';');
+            // roundtrip=false + source=first: começa no primeiro ponto, visita todos sem voltar
+            let url = `https://router.project-osrm.org/trip/v1/driving/${coords}?roundtrip=false&source=first&destination=last&geometries=geojson&overview=false`;
+            
+            let res = await fetch(url);
+            let data = await res.json();
+            
+            if (data.code === 'Ok' && data.waypoints && data.waypoints.length === rotaOrdenada.length) {
+                // Extrair a ordem otimizada dos waypoints
+                let novaRota = new Array(rotaOrdenada.length);
+                data.waypoints.forEach((wp, originalIdx) => {
+                    novaRota[wp.waypoint_index] = rotaOrdenada[originalIdx];
+                });
+                // Filtrar nulls (segurança)
+                novaRota = novaRota.filter(Boolean);
+                
+                // Garantir que o ponto fixo está no início
+                let startOS = rotaOrdenada[0];
+                let posAtual = novaRota.findIndex(os => os.os === startOS.os);
+                if (posAtual > 0) {
+                    novaRota.splice(posAtual, 1);
+                    novaRota.unshift(startOS);
+                }
+                
+                console.log('[OSRM Trip] Rota otimizada por estrada com sucesso.');
+                return novaRota;
+            }
+            throw new Error('OSRM Trip retornou resposta inválida');
+        } catch(e) {
+            console.warn('[OSRM Trip] Falha, usando fallback haversine:', e.message);
+            return reordenarRotaPorProximidade(rotaOrdenada, 0);
+        }
+    }
+
     // =====================================================
     // === ALGORITMO PRINCIPAL (com distribuição equilibrada)
     // =====================================================
@@ -1520,7 +1599,7 @@
             let numOS = os['OS'] || '-';
             let cidade = (os['Cidade'] || '').trim().toUpperCase();
             let bairro = (os['Bairro'] || '').trim().toUpperCase();
-            let dGeracao = parseDateCustom(os['Data de Geração'] || os['Data de Geracao']);
+            let dGeracao = parseDateCustom(os['Data de Geração'] || os['Data de Geracao'] || os['Data da Geração'] || os['Data da Geracao']);
             let dVenc = parseDateCustom(os['Data de Vencimento']);
             
             let obs1 = (os['Observação 1'] || os['Observacao 1'] || '').toString().toUpperCase();
@@ -1550,21 +1629,23 @@
 
             if (obs2.length > 0) { restritasObs2.push(osData); return; }
 
-            let bairroMapeado = dbBairros[cidade] && dbBairros[cidade][bairro];
-            const LIMITE_DISTANCIA_VALIDACAO_KM = 5; // Distância máxima aceitável entre coordenada Excel e bairro
+            // --- BUSCA NORMALIZADA (ignora acentos e casing) ---
+            let match = buscarBairroNormalizado(cidade, bairro);
+            let bairroMapeado = match ? match.dados : null;
+            const LIMITE_DISTANCIA_VALIDACAO_KM = 10; // Distância máxima aceitável entre coordenada Excel e bairro
 
             if (hasExcelCoords && bairroMapeado) {
                 // Coordenada do Excel + bairro mapeado → validar distância
-                let distBairro = haversine(excelLat, excelLng, dbBairros[cidade][bairro].lat, dbBairros[cidade][bairro].lng);
+                let distBairro = haversine(excelLat, excelLng, bairroMapeado.lat, bairroMapeado.lng);
                 if (distBairro <= LIMITE_DISTANCIA_VALIDACAO_KM) {
                     // Coordenada está próxima do bairro → usar coordenada precisa do Excel
                     osData.lat = excelLat;
                     osData.lng = excelLng;
                     osData.usouCoordenadaExcel = true;
                 } else {
-                    // Coordenada muito distante do bairro → desconsiderar, usar bairro
-                    osData.lat = dbBairros[cidade][bairro].lat;
-                    osData.lng = dbBairros[cidade][bairro].lng;
+                    // Coordenada muito distante do bairro (>10km) → usar posição do bairro no mapa
+                    osData.lat = bairroMapeado.lat;
+                    osData.lng = bairroMapeado.lng;
                     osData._coordExcelDescartada = true;
                     osData._distanciaBairroKm = distBairro.toFixed(1);
                 }
@@ -1578,8 +1659,8 @@
                 validOS.push(osData);
             } else if (!hasExcelCoords && bairroMapeado) {
                 // Sem coordenada no Excel, bairro mapeado → usar bairro (comportamento original)
-                osData.lat = dbBairros[cidade][bairro].lat;
-                osData.lng = dbBairros[cidade][bairro].lng;
+                osData.lat = bairroMapeado.lat;
+                osData.lng = bairroMapeado.lng;
                 validOS.push(osData);
             } else {
                 // Sem coordenada e sem bairro mapeado → pendência
@@ -1744,13 +1825,21 @@
             }
         }
 
-        // --- FASE 3: REORDENAÇÃO PELO USUÁRIO ---
+        // --- FASE 3: OTIMIZAÇÃO POR ESTRADA (OSRM Trip) + REORDENAÇÃO PELO USUÁRIO ---
+        // Primeiro, otimizar automaticamente todas as rotas usando estradas reais
+        for (let re of rotasEquipes) {
+            if (re.rota.length >= 2) {
+                re.rota = await reordenarRotaPorEstrada(re.rota, 0);
+            }
+        }
+
+        // Depois, permitir que o usuário escolha pontos de partida
         let escolhasReorder = await pedirReordenacao(rotasEquipes);
         if (escolhasReorder && Object.keys(escolhasReorder).length > 0) {
             for (let re of rotasEquipes) {
                 if (escolhasReorder[re.equipe.nome] !== undefined) {
                     let startIdx = escolhasReorder[re.equipe.nome];
-                    re.rota = reordenarRotaPorProximidade(re.rota, startIdx);
+                    re.rota = await reordenarRotaPorEstrada(re.rota, startIdx);
                 }
             }
         }
